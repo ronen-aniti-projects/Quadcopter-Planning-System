@@ -1,21 +1,25 @@
-# Path and Trajectory Planning System for Quadcopters Navigating Dense Urban Environments
+# Integrated Path and Trajectory Planning System for Autonomous Quadcopter Navigation in Dense Outdoor Urban Environments
 
-## Summary
-I developed an integrated path and trajectory planning system for drone navigation in dense urban environments. Given an obstacle bounding box map, this system can plan trajectories between any two locations that are near-shortest distance, smooth, collision free, and conformant to a user defined average speed.The system processes obstacle data, constructs a graph, plans a coarse path using the A* algorithm, refines that path using RRT, then finally plans a trajectory through those points using a polynomial trajectory algorithm. This was a self-directed project, and I am planning on building on it as a first-semester M.Eng student in Robotics Engineering at University of Maryland, College Park. 
+## Overview
+The goal of this independent project was to gain experience with path and trajectory planning algorithms, C++, and to prepare to begin a course of formal study at University of Maryland, College Park: the M.Eng. in Robotics Engineering. 
 
-## Obstacle Definition
+To this end, I have, with this project, developed an integrated path and trajectory planning system in C++ that does well to compute smooth, collision-free, near shortest-distance trajectory plans between any two points on large, obstacle-dense 3D maps of outdoor urban spaces. I designed the planning system to comprise three main subsystems: coarse path planning with A* graph search, refined path planning with RRT, and trajectory planning with a 7th order polynomial solver I built from first principles that does well to approximate minimum snap trajectories. 
 
-I define the obstacle processing subsystem. The way I implement the obstacle processing subsystem is Y. The way each of these parts works is by Z. I know the obstacle processing subsystem works is because of this.
+## Performance and Validation
+Through Monte Carlo simulations, I have thus far characterized the performance of the system as follows: 
+- Global Path Planning: <0.2s for target waypoints ~259m apart.
+- Local Path Planning: <0.12s for waypoints spaced ~50m apart. 
+- Trajectory Planning: <0.15s to solve for time-ordered trajectory between ~100 waypoints spaced 1m apart.
 
-## Global Planning Subsystem
+Trajectories between points are typified with this example of a plan computed between (0,0,0) and (200,200,200) using a desired average speed of 2 m/s. 
 
-I design the global planning subsystem to achieve the goal of X. The way I implement the global planning subsystem is Y. The way each of these parts works is by Z. I know the global planning subsystem works because of this. 
+As I developed this project, I've considered optimizations, performance tradeoffs, and technical challenges, including the following, which I worked to solve: 
+- Balancing global planning resolution with execution time -- I solved by finding a middle-ground planning resolution
+- Efficiently finding the nearest obstacle to a query point given datasets with >4000 obstacle -- I solved by employing a spatial data structure called a KDTree
+- Constructing a trajectory planner the generates smooth trajectories between waypoints -- I solved by building a custom 7th order polynomial interpolation module from first principles
 
-## Local Planning Subsystem
+## Dependencies 
+This project depends on a KDTree library called KDTree (by J. Frederico Carvalho) and the Eigen library. 
 
-## Trajectory Planning Subsystem 
-
-## System Validation
-I design a system level test to achieve the goal of Y. The way I implement the test is by this. The results are this. The results show this. 
-
-## Conclusion
+## Note 
+This is an evolving project. I hope to expand on this project this semester in ENPMXXXX (Planning) as a first semester M.Eng. student at University of Maryland, College Park. 
