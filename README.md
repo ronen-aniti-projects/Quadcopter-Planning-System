@@ -7,7 +7,7 @@ To this end, I have, with this project, developed an integrated path and traject
 
 ## Performance and Validation
 Through Monte Carlo simulations, I have thus far characterized the performance of the system as follows: 
-- Global Path Planning: <0.2s for target waypoints ~259m apart.
+- Global Path Planning: <0.01s for target waypoints ~650m apart.
 - Local Path Planning: <0.12s for waypoints spaced ~50m apart. 
 - Trajectory Planning: <0.15s to solve for time-ordered trajectory between ~100 waypoints spaced 1m apart.
 

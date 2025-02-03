@@ -4,6 +4,7 @@
 #include "KDTree.hpp"
 #include <random>
 #include <cmath>
+#include <iostream>
 
 RRT::RRT(Point3D start, Point3D goal, ObstacleData& obstacleData, float stepSize, int maxIterations, float goalBias) :
     start_(start), goal_(goal), obstacleData_(obstacleData),
@@ -81,7 +82,7 @@ Point3D RRT::moveTowards(const Point3D& from, const Point3D& to){
     // Otherwise move stepSize_ towards target
     Point3D newPoint;
     for (int i = 0; i < 3; i++){
-        newPoint[i] = from[i] + (direction[i]/distance) * stepSize * i;
+        newPoint[i] = from[i] + (direction[i]/distance) * stepSize_;
     }
     return newPoint;
 }
@@ -90,5 +91,86 @@ bool RRT::isPathClear(const Point3D& start, const Point3D& end){
     Point3D direction;
     float distance = 0.0f;
     
+    // Calculate total distance
+    for (int i = 0; i < 3; i++){
+        direction[i] = end[i] - start[i];
+        distance += direction[i] * direction[i];
+    }
+    distance = sqrt(distance);
+
+    // Check intermediate points 
+    int steps = static_cast<int> (distance / stepSize_);
+    for (int i = 1; i <= steps; i++){
+        Point3D checkPoint; 
+        for (int j = 0; j < 3; j++){
+            checkPoint[j] = start[j] + (direction[j] / distance) * stepSize_ * i;
+        }
+        if (obstacleData_.isCollisionDetected(checkPoint)){
+            return false;
+        }
+
+    }
+    return true;
+    
 }
 
+std::vector<Point3D> RRT::plan(){ 
+    for (int i = 0; i < maxIterations_; i++){
+
+        // 1. Sample a random point
+        Point3D sample = randomSample();
+
+        // 2. Find nearest existing node
+        Point3D nearest = findNearest(sample);
+
+        // 3. Move towards sample by one step
+        Point3D newNode = moveTowards(nearest, sample);
+
+        // 4. Check if this path is collision-free
+        if (isPathClear(nearest, newNode)){
+            // Add newNode to the tree
+            tree_[newNode] = nearest;
+
+            // Terminate planning when newNode is close enough to goal
+            float distToGoal = 0.0f;
+            for (int j = 0; j < 3; j++){
+                distToGoal += (newNode[j] - goal_[j]) * (newNode[j] - goal_[j]);
+            }
+            distToGoal = sqrt(distToGoal);
+            if (distToGoal < stepSize_){
+                tree_[goal_] = newNode;
+
+                // Reconstruct the path
+                std::vector<Point3D> path;
+                Point3D current = goal_;
+                while (true){
+                    path.push_back(current);
+                    current = tree_[current];
+                    if (current[0] == start_[0] && current[1] == start_[1] && current[2] == start_[2]){
+                        path.push_back(start_);
+                        std::reverse(path.begin(), path.end());  
+                        return path;
+                    }
+                }
+            }
+        }
+    
+    }
+           return {};
+ 
+}
+
+Points3D shortcutPath(const Points3D& inputPath){
+    if (inputPath.empty()){
+        return {};
+
+    }
+
+    int endIndex = inputPath.size() - 1;
+    
+
+}
+
+Points3D enhancedShortenedPath(const Points3D& shortcutPath, float res){
+
+}

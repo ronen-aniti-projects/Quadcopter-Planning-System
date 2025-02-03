@@ -9,9 +9,14 @@ class RRT{
 
 public:
     RRT(Point3D start, Point3D goal, ObstacleData& obstacleData, 
-        float stepSize=1.0f, int maxIterations=1000, float goalBias=0.1f);
+        float stepSize=1.0f, int maxIterations=10000, float goalBias=0.1f);
 
     Points3D plan();
+    
+    // Post-process
+    Points3D shortcutPath(const Points3D& inputPath);
+    Points3D enhancedShortenedPath(const Points3D& shortcutPath, float res = 3.0f);
+    
 
 
 

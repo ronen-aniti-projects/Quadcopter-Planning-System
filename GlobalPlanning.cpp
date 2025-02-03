@@ -1,6 +1,8 @@
 #include "GlobalPlanning.h"
 #include <iostream>
 #include <queue>
+#include <cmath>
+#include <limits>
 
 FreeSpaceGraph::FreeSpaceGraph(){}
 
@@ -21,7 +23,7 @@ return {static_cast<float>(p[0]),
         static_cast<float>(p[2])};
 }
 
-void FreeSpaceGraph::generateGraph(const ObstacleData& obstacles, float resolution=25.0f){
+void FreeSpaceGraph::generateGraph(const ObstacleData& obstacles, float resolution){
 
     points.clear();
     adjacencyList.clear();

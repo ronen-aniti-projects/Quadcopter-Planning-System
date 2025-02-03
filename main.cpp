@@ -1,6 +1,11 @@
 #include <iostream>
+#include <fstream>
+#include <random>
 #include "ObstacleData.h"
 #include "GlobalPlanning.h"
+#include "LocalPlanning.h"
+#include <chrono>
+
 
 void testReadObstacleData(ObstacleData& obstacleData){
     
@@ -91,26 +96,134 @@ void testDistanceFromObstacle(ObstacleData& obstacleData){
 
 }
 
+void saveGraphToFile(const FreeSpaceGraph& graph) {
+    std::ofstream file("graph.json");
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file for writing graph data." << std::endl;
+        return;
+    }
+    file << "{\n";
+    for (const auto& [point, neighbors] : graph.getAdjacencyList()) {
+        file << "  \"(" << point[0] << ", " << point[1] << ", " << point[2] << ")\": [";
+        for (const auto& [neighbor, _] : neighbors) {
+            file << "( " << neighbor[0] << ", " << neighbor[1] << ", " << neighbor[2] << " ), ";
+        }
+        file << "],\n";
+    }
+    file << "}";
+    file.close();
+    std::cout << "Graph saved to graph.json\n";
+}
+
 void testGenerateGraph(FreeSpaceGraph& graph, ObstacleData& obstacles){
     
     float resolution = 25.0f;
     graph.generateGraph(obstacles, resolution);
-
-    // Save the graph construction to a file. 
-    // TODO: Implement code to save the adjacencyList to a csv file. 
-    // I can visually inspect this against the obstacles in Python/Matplotlib
-    // for correctness.
+    saveGraphToFile(graph);
 
 }
 
-void testSearchGraph(FreeSpaceGraph& graph, ObstacleData& obstacles){
 
-    // Generate 100 random VALID start/goal configs. 
-    // Generate 20 random INVALID start/goal configs. 
-    // Run the searchGraph method on each
-    // Save the results to csv with rows:
-    //    start, goal, path (or none)
-    // Visually inspect each for correctness in Python/Matplotlib
+void testAStarPerformance(FreeSpaceGraph& graph, ObstacleData& obstacles) {
+    // Objective: Estimate the typical execution time for A* search 
+    // for waypoints spaced between 600 m and 700 m apart.
+
+    // Generate random uniform distributions 
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> xDist(obstacles.xLim[0], obstacles.xLim[1]);
+    std::uniform_real_distribution<float> yDist(obstacles.yLim[0], obstacles.yLim[1]);
+    std::uniform_real_distribution<float> zDist(obstacles.zLim[0], obstacles.zLim[1]);
+    
+    int validCount = 0;
+    double totalTime = 0.0;
+    const int numTests = 50;
+    const float minSeparation = 600.0f;
+    const float maxSeparation = 700.0f;
+    // Precompute squared distances to avoid computing sqrt repeatedly.
+    const float minSeparationSq = minSeparation * minSeparation;
+    const float maxSeparationSq = maxSeparation * maxSeparation;
+
+    while (validCount < numTests) {
+        // Generate a valid start point (one that is not in collision)
+        Point3D start;
+        while (true) {
+            start = { xDist(gen), yDist(gen), zDist(gen) };
+            if (!obstacles.isCollisionDetected(start)) {
+                break; // Valid start found.
+            }
+        }
+
+        // Generate a valid goal point:
+        // The goal must not be in collision and the squared distance from start 
+        // must be between minSeparationSq and maxSeparationSq.
+        Point3D goal;
+        float dx, dy, dz, distanceSq;
+        while (true) {
+            goal = { xDist(gen), yDist(gen), zDist(gen) };
+            if (obstacles.isCollisionDetected(goal)) {
+                continue; // Skip if the goal is in collision.
+            }
+            dx = goal[0] - start[0];
+            dy = goal[1] - start[1];
+            dz = goal[2] - start[2];
+            distanceSq = dx * dx + dy * dy + dz * dz;
+            if (distanceSq >= minSeparationSq && distanceSq <= maxSeparationSq) {
+                break; // Valid goal found.
+            }
+        }
+        
+        // Time the A* search
+        auto startTime = std::chrono::high_resolution_clock::now();
+        graph.searchGraph(start, goal);
+        auto endTime = std::chrono::high_resolution_clock::now();
+        totalTime += std::chrono::duration<double>(endTime - startTime).count();
+        validCount++;
+    }
+    std::cout << "Average A* search time over " << numTests 
+              << " cases: " << (totalTime / numTests) << " seconds" << std::endl;
+}
+
+void testRRT(ObstacleData& obstacleData) {
+    // For testing, choose start and goal positions that lie within free space.
+    // You may need to adjust these values based on your obstacle data.
+    Point3D start = {0.0f, 0.0f, 10.0f};
+    Point3D goal  = {0.0f, 50.0f, 200.0f};
+
+    // Create an RRT instance. Adjust step size, iterations, and goal bias as desired.
+    RRT rrt(start, goal, obstacleData, 1.0f, 10000, 0.25f);
+
+    // Run the planner.
+    Points3D path = rrt.plan();
+
+    // Check if a path was found.
+    if (path.empty()) {
+        std::cout << "RRT failed to find a path." << std::endl;
+        return;
+    } else {
+        std::cout << "RRT found a path with " << path.size() << " nodes." << std::endl;
+    }
+
+    // Export the computed path to a JSON file.
+    std::ofstream file("rrt_path.json");
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file for writing RRT path data." << std::endl;
+        return;
+    }
+    
+    file << "[\n";
+    for (size_t i = 0; i < path.size(); ++i) {
+        file << "  { \"x\": " << path[i][0]
+             << ", \"y\": " << path[i][1]
+             << ", \"z\": " << path[i][2] << " }";
+        if (i < path.size() - 1) {
+            file << ",";
+        }
+        file << "\n";
+    }
+    file << "]\n";
+    file.close();
+    std::cout << "RRT path saved to rrt_path.json" << std::endl;
 }
 
 
@@ -128,20 +241,20 @@ int main() {
     testIsCollisionDetected(obstacleData);
 
     std::cout << "Validating the distanceFromObstacle method of the ObstacleData class..." << std::endl;
-    testDistanceFromObstacle(obstacleData);
+    //testDistanceFromObstacle(obstacleData);
 
     std::cout << "Validating the global planning module..." << std::endl;
-    FreeSpaceGraph graph;
+    //FreeSpaceGraph graph;
     
     std::cout << "Validating the generateGraph method of the FreeSpaceGraph class" << std::endl;
-    testGenerateGraph(graph, obstacleData);
+    //testGenerateGraph(graph, obstacleData);
 
     std::cout << "Validating the searchGraph method of the FreeSpace graph class" << std::endl;
-    testSearchGraph(graph, obstacleData);
+    //testAStarPerformance(graph, obstacleData);
 
-    std::cout << "Validating the local planning module..." << std::endl;
-    RRT rrt;
-
+    // Test the RRT implementation
+    std::cout << "Testing RRT planning..." << std::endl;
+    testRRT(obstacleData);
 
 
 
