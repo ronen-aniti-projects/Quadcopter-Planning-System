@@ -102,20 +102,41 @@ bool ObstacleData::isCollisionDetected(const Point3D& queryPoint) const{
     size_t index = queryGroundCenter({queryPoint[0], queryPoint[1]});
     const auto& center = obstacleCenters3d[index];
     const auto& halfsize = obstacleGroundCenterHalfsizes[index];
-    float zHalfsize = obstacleZHalfsizes[index];
+    float zHalfsize = obstacleZHalfsizes[index]; 
 
-    return (std::abs(queryPoint[0] - center[0]) <= halfsize[0] &&
-            std::abs(queryPoint[1] - center[1]) <= halfsize[1] &&
+    return (std::abs(queryPoint[0] - center[0]) <= halfsize[0]  &&
+            std::abs(queryPoint[1] - center[1]) <= halfsize[1]  &&
             std::abs(queryPoint[2] - center[2]) <= zHalfsize);
 }
 
 float ObstacleData::distanceFromObstacle(const Point3D& queryPoint) const {
+
     size_t index = queryGroundCenter({queryPoint[0], queryPoint[1]});
     const auto& center = obstacleCenters3d[index];
     const auto& halfsize = obstacleGroundCenterHalfsizes[index];
     float zHalfsize = obstacleZHalfsizes[index];
-    float dx = std::max(center[0] - halfsize[0] - queryPoint[0], 0.0f);
-    float dy = std::max(center[1] - halfsize[1] - queryPoint[1], 0.0f);
-    float dz = std::max(center[2] - zHalfsize - queryPoint[2], 0.0f);
+
+
+    float dx = 0.0f;
+    if (queryPoint[0] < center[0] - halfsize[0]) {
+        dx = (center[0] - halfsize[0]) - queryPoint[0];
+    } else if (queryPoint[0] > center[0] + halfsize[0]) {
+        dx = queryPoint[0] - (center[0] + halfsize[0]);
+    }
+
+    float dy = 0.0f;
+    if (queryPoint[1] < center[1] - halfsize[1]) {
+        dy = (center[1] - halfsize[1]) - queryPoint[1];
+    } else if (queryPoint[1] > center[1] + halfsize[1]) {
+        dy = queryPoint[1] - (center[1] + halfsize[1]);
+    }
+
+    float dz = 0.0f;
+    if (queryPoint[2] < center[2] - zHalfsize) {
+        dz = (center[2] - zHalfsize) - queryPoint[2];
+    } else if (queryPoint[2] > center[2] + zHalfsize) {
+        dz = queryPoint[2] - (center[2] + zHalfsize);
+    }
+
     return std::sqrt(dx * dx + dy * dy + dz * dz);
 }

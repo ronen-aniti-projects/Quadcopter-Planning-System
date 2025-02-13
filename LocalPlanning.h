@@ -16,7 +16,10 @@ public:
     // Post-process
     Points3D shortcutPath(const Points3D& inputPath);
     Points3D enhancedShortenedPath(const Points3D& shortcutPath, float res = 3.0f);
-    
+
+    // Helpers
+    bool closeEnough(const Point3D& point1, const Point3D& point2);
+
 
 
 

@@ -9,8 +9,17 @@
 RRT::RRT(Point3D start, Point3D goal, ObstacleData& obstacleData, float stepSize, int maxIterations, float goalBias) :
     start_(start), goal_(goal), obstacleData_(obstacleData),
     stepSize_(stepSize), maxIterations_(maxIterations), goalBias_(goalBias) {
-        tree_[start] = {0,0,0};
+        tree_[start] = start;
     } 
+
+bool RRT::closeEnough(const Point3D& point1, const Point3D& point2){
+    float epsilon = 1e-6f;
+    if (std::fabs(point1[0] - point2[0]) < epsilon && std::fabs(point1[1] - point2[1]) < epsilon && std::fabs(point1[2] - point2[2]) < epsilon){
+        return true;
+    }
+    return false;
+
+}
 
 Point3D RRT::randomSample(){
     
@@ -141,12 +150,12 @@ std::vector<Point3D> RRT::plan(){
                 tree_[goal_] = newNode;
 
                 // Reconstruct the path
-                std::vector<Point3D> path;
+                Points3D path;
                 Point3D current = goal_;
                 while (true){
                     path.push_back(current);
                     current = tree_[current];
-                    if (current[0] == start_[0] && current[1] == start_[1] && current[2] == start_[2]){
+                    if (closeEnough(current, start_)){
                         path.push_back(start_);
                         std::reverse(path.begin(), path.end());  
                         return path;
@@ -160,17 +169,79 @@ std::vector<Point3D> RRT::plan(){
  
 }
 
-Points3D shortcutPath(const Points3D& inputPath){
+Points3D RRT::shortcutPath(const Points3D& inputPath){
     if (inputPath.empty()){
         return {};
 
     }
-
     int endIndex = inputPath.size() - 1;
-    
+    int startIndex = 0;
+    int currentEndIndex = endIndex;
+    int currentStartIndex = startIndex; 
+    std::vector<int> shortcutIndices;
+    shortcutIndices.push_back(endIndex);
+
+    while(currentStartIndex < currentEndIndex){
+        bool shortcutFound = false;
+        while (currentStartIndex < currentEndIndex){
+            if (isPathClear(inputPath[currentStartIndex], inputPath[currentEndIndex])){
+                shortcutIndices.push_back(currentStartIndex);
+                shortcutFound = true;
+                break;
+            } else {
+                currentStartIndex++; 
+            }
+        }
+        if (shortcutFound){
+            currentEndIndex = shortcutIndices.back();
+            currentStartIndex = 0;
+        } else { 
+            currentEndIndex--;
+            shortcutIndices.push_back(currentEndIndex);
+            currentStartIndex = 0;
+        }
+    }
+    std::reverse(shortcutIndices.begin(), shortcutIndices.end());
+    Points3D shorterPath;
+    for (int idx : shortcutIndices){
+        shorterPath.push_back(inputPath[idx]);
+    }
+    return shorterPath;
+
 
 }
 
-Points3D enhancedShortenedPath(const Points3D& shortcutPath, float res){
+Points3D RRT::enhancedShortenedPath(const Points3D& shortcutPath, float res){
+    Points3D enhancedPath; 
+    
+    for (size_t i = 0; i < shortcutPath.size() - 1; i++){
+        const Point3D& start = shortcutPath[i];
+        const Point3D& end = shortcutPath[i+1];
 
+        Point3D direction; 
+        float distance = 0.0f;
+        for (int j = 0; j < 3; j++){
+            direction[j] = end[j] - start[j];
+            distance += direction[j] * direction[j];
+
+        }
+        distance = std::sqrt(distance);
+
+        Point3D directionUnit;
+        for (int j = 0; j < 3; j++){
+            directionUnit[j] = direction[j] / distance;
+        }
+
+        int numPoints = static_cast<int>(distance / res);
+        for (int j = 0; j < numPoints; j++){
+            Point3D intermediate;
+            for (int k=0; k<3; k++){
+                intermediate[k] = start[k] + directionUnit[k] * j * res;
+            }
+            enhancedPath.push_back(intermediate);
+        }
+    }
+    // Append the final waypoint
+    enhancedPath.push_back(shortcutPath.back());
+    return enhancedPath;
 }
