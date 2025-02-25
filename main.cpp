@@ -5,6 +5,8 @@
 #include "GlobalPlanning.h"
 #include "LocalPlanning.h"
 #include <chrono>
+#include <Eigen/Dense>
+#include "TrajectoryPlanning.h"
 
 
 void testReadObstacleData(ObstacleData& obstacleData){
@@ -358,6 +360,47 @@ void testRRTMonteCarlo(ObstacleData& obstacleData) {
 
 
 
+
+void testTrajectoryPlanner() {
+    std::cout << "Running trajectory planner test..." << std::endl;
+    
+    // Define a set of test waypoints (same as your Python example)
+    Points3D testWaypoints = {
+        { -100.0f, -50.0f, 200.0f },
+        { -95.95f, -49.01f, 190.91f },
+        { -91.90f, -48.02f, 181.82f },
+        { -87.85f, -47.02f, 172.73f },
+        { -83.80f, -46.03f, 163.64f },
+        { -75.75f, -44.06f, 145.55f },
+        { -71.29f, -41.46f, 136.98f },
+        { -66.83f, -38.87f, 128.41f },
+        { -62.37f, -36.28f, 119.85f },
+        { -57.91f, -33.68f, 111.28f },
+        { -53.45f, -31.09f, 102.71f },
+        { -48.99f, -28.50f, 94.14f },
+        { -44.54f, -25.90f, 85.58f },
+        { -40.08f, -23.31f, 77.01f },
+        { -35.62f, -20.72f, 68.44f },
+        { -31.16f, -18.12f, 59.88f },
+        { -26.70f, -15.53f, 51.31f },
+        { -22.24f, -12.94f, 42.74f },
+        { -17.78f, -10.34f, 34.17f },
+        { -13.33f, -7.75f, 25.61f },
+        { -8.87f, -5.16f, 17.04f },
+        { 0.0f, 0.0f, 0.0f }
+    };
+    
+    double maxSpeed = 5.0;
+    TrajectoryPlanner planner(testWaypoints, maxSpeed);
+    TrajectorySolution sol = planner.solveTrajectory();
+
+    std::cout << "Trajectory Planner Coefficients:" << std::endl;
+    std::cout << "X coefficients:\n" << sol.xCoeffs << std::endl << std::endl;
+    std::cout << "Y coefficients:\n" << sol.yCoeffs << std::endl << std::endl;
+    std::cout << "Z coefficients:\n" << sol.zCoeffs << std::endl << std::endl;
+    
+}
+
 int main() {
 
 
@@ -390,6 +433,14 @@ int main() {
     // Run the Monte Carlo RRT test.
     std::cout << "Running Monte Carlo RRT tests..." << std::endl;
     testRRTMonteCarlo(obstacleData);
+
+    // Run the trajectory planner and inspect the generated polynomial coefficients 
+    std::cout << "Running trajectory planner test..." << std::endl;
+    testTrajectoryPlanner();
+
+    // 
+
+
 
     return 0;
 }
