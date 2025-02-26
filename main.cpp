@@ -415,20 +415,20 @@ int main() {
     testIsCollisionDetected(obstacleData);
 
     std::cout << "Validating the distanceFromObstacle method of the ObstacleData class..." << std::endl;
-    //testDistanceFromObstacle(obstacleData);
+    testDistanceFromObstacle(obstacleData);
 
     std::cout << "Validating the global planning module..." << std::endl;
-    //FreeSpaceGraph graph;
+    FreeSpaceGraph graph;
     
     std::cout << "Validating the generateGraph method of the FreeSpaceGraph class" << std::endl;
-    //testGenerateGraph(graph, obstacleData);
+    testGenerateGraph(graph, obstacleData);
 
     std::cout << "Validating the searchGraph method of the FreeSpace graph class" << std::endl;
-    //testAStarPerformance(graph, obstacleData);
+    testAStarPerformance(graph, obstacleData);
 
     // Test the RRT implementation
-    //std::cout << "Testing RRT planning..." << std::endl;
-    //testRRT(obstacleData);
+    std::cout << "Testing RRT planning..." << std::endl;
+    testRRT(obstacleData);
 
     // Run the Monte Carlo RRT test.
     std::cout << "Running Monte Carlo RRT tests..." << std::endl;
