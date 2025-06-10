@@ -25,15 +25,15 @@ For mathematical context, the integrated path and trajectory planning system ass
 
 The space occupied by the entire map is represented by the set of all points in $R^3$ bounded by the limits of the input obstacle geometry. 
 
-$$
-E = \{ (x,y,z) \in \mathbb{R}^3 \mid x_{\min} \le x \le x_{\max}, \; y_{\min} \le y \le y_{\max}, \; z_{\min} \le z \le z_{\max} \}.
-$$
+<p align="center">
+  <img src="figures/Workspace_Model.png" alt="Workspace Model" width="600">
+</p>
 
 The space represented by each obstacle subvolume is represented by the set of all the points it bounds. 
 
-$$
-O_i = \left\{ (x,y,z) \in \mathbb{R}^3 \ \middle| \ \begin{array}{l} x_{c,i} - h_{x,i} \leq x \leq x_{c,i} + h_{x,i},\\[1ex] y_{c,i} - h_{y,i} \leq y \leq y_{c,i} + h_{y,i},\\[1ex] z_{c,i} - h_{z,i} \leq z \leq z_{c,i} + h_{z,i} \end{array} \right\}.
-$$
+<p align="center">
+  <img src="figures/Obstacle_Model.png" alt="Obstacle Model" width="400">
+</p>
 
 In this formulation, $(x_{c,i}, y_{c,i}, z_{c,i})$ denotes the center coordinate of the obstacle's bounding box and $h_{x,i}, h_{y,i}, h_{z,i}$ represent the halfwidths along the $x$-, $y$-, and $z$-axes, respectively.
 
