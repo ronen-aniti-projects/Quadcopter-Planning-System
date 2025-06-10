@@ -55,7 +55,7 @@ The integrated path and trajectory planning system has two main modules dedicate
 ### The Global Path Planning Subsystem
 The global pathfinding module works by first constructing, and saving to memory, a bi-directional graph data structure to broadly and uniformly represent free space (non-obstacle space), then, using the well-established A* search algorithm, searching this construction for a shortest-distance path between two desired positions, start and goal. The module functions as a multi-query planner, with the graph of free space meant to be created only one time and the search functionality to be called repeatedly against the generated graph structure.
 
-The module’s FreeSpaceGraph class, which encapsulates both the module’s graph building and the module’s graph searching functionality, contains a method called generateGraph, which constructs the graph, forming it in the shape of a cubic-lattice, with nodes representing points in free space and edges representing collision-free navigable routes. Edge-length is a parameter, serving as a control on the resolution of the graph structure. The method connects each graph node to, at most, six of its cubic-lattice neighbors. The searchGraph method of the FreeSpaceClass encapsulates an implementation of the A* algorithm and will return the shortest-distance path, to the resolution of the constructed cubic-lattice, when provided with a non-obstacle start point and a non-obstacle goal point, or it will provide an empty path otherwise.
+The module’s `FreeSpaceGraph` class, which encapsulates both the module’s graph building and the module’s graph searching functionality, contains a method called `generateGraph`, which constructs the graph, forming it in the shape of a cubic-lattice, with nodes representing points in free space and edges representing collision-free navigable routes. Edge-length is a parameter, serving as a control on the resolution of the graph structure. The method connects each graph node to, at most, six of its cubic-lattice neighbors. The `searchGraph` method of the `FreeSpaceClass` encapsulates an implementation of the A* algorithm and will return the shortest-distance path, to the resolution of the constructed cubic-lattice, when provided with a non-obstacle start point and a non-obstacle goal point, or it will provide an empty path otherwise.
 
 Like the obstacle processing module, the global planning module also employs the KDTree data structure to enhance performance of its key operations, namely edge creation and edge validation, which occur after the module has determined valid locations for all of the nodes of the free space graph. In edge creation, the module is determining the six neighbor nodes to each free space graph node. In edge validation, the module discretizes each edge into a sequence of test points along the line segment connecting the edge’s nodes, then checks each of these test points for collision with obstacles. By leveraging access to the KDTree of obstacle positions created by the obstacle processing module and by organizing all the free space nodes in a second KDTree, the global planning module performs both the edge creation and edge validation steps in $O(N ln(N))$ time complexity, which represents a reduction compared to the brute force $O(N^2)$ alternative. 
 
@@ -76,7 +76,7 @@ The local planning module is centered around a custom implementation of the rapi
 
 **Figure 6.** This visualization typifies computed results of the integrated path and trajectory planning’s local planning subsystem. The RRT algorithm will expand a search tree from the start node, shown in green, to the goal node, shown in red. The raw path from start to goal through the RRT search tree will almost always be jagged, which is why the local planning module employs post-processing to produce a shortcut path, shown in orange. A second post-process step, whose results are shown as a blue dashed line, enforces a consistent spacing between points. 
  
-The local planning module’s entire functionality is encapsulated in its RRT class, which accepts as input a start and goal location as well as various RRT specific parameters, including stepSize, maxIterations, and goalBias. While the implementation provides reference values that perform reasonably well on the obstacle map provided in this repository, these parameters are meant to be tuned to achieve maximum performance, especially for maps other than this one. 
+The local planning module’s entire functionality is encapsulated in its RRT class, which accepts as input a start and goal location as well as various RRT specific parameters, including `stepSize`, `maxIterations`, and `goalBias`. While the implementation provides reference values that perform reasonably well on the obstacle map provided in this repository, these parameters are meant to be tuned to achieve maximum performance, especially for maps other than this one. 
 
 ## The Trajectory Planning Subsystem
 The trajectory planning subsystem treats the trajectory planning problem into a polynomial segmentation problem, with the trajectory as a whole modeled as a piecewise continuous function and with each segment of the trajectory modeled as a degree-seven polynomial. The mathematical challenge that the algorithm underlying the trajectory planning subsystem solves is the challenge of solving for all of the coefficients on all of the polynomial segments such that create a smooth and flyable trajectory that passes through each waypoint. If there are, in general, N input waypoints, then there are thus $N - 1$ trajectory segments and $8(N - 1)$ unknown coefficients to solve for. 
@@ -99,8 +99,6 @@ x'(t_0^s) = 0,\quad x''(t_0^s) = 0,\quad x'''(t_0^s) = 0,\quad x'(t_{N-1}^e) = 0
 $$" width="600">
 </p>
 
-
-
 The next $N$ constraints come from fixing the position at each waypoint. Mathematically,
 
 <p align="center">
@@ -108,8 +106,6 @@ The next $N$ constraints come from fixing the position at each waypoint. Mathema
 \begin{aligned} x(t_0^s) &= x_0, \\ x(t_1^s) &= x_1, \\ &\quad\vdots \\ x(t_{N-1}^s) &= x_{N-1}. \end{aligned} 
 $$" width="125">
 </p>
-
-
 
 The remaining constraints, which count to $7 * (N - 2)$, come from enforcing continuity in position plus the first six motion derivatives of motion at each of the intermediate waypoints. Mathematically, 
 
@@ -124,7 +120,6 @@ x^{(6)}(t_0^e) &= x^{(6)}(t_1^s),\quad x^{(6)}(t_1^e) = x^{(6)}(t_2^s),\quad \ld
 \end{aligned}
 $$" width="510">
 </p>
-
 
 The trajectory planning module’s code develops the system of equations in a matrix form, leveraging the C++ matrix linear algebra library. The matrix equation has the form 
 
