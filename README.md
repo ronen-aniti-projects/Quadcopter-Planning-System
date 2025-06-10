@@ -81,26 +81,40 @@ The local planning module’s entire functionality is encapsulated in its RRT cl
 ## The Trajectory Planning Subsystem
 The trajectory planning subsystem treats the trajectory planning problem into a polynomial segmentation problem, with the trajectory as a whole modeled as a piecewise continuous function and with each segment of the trajectory modeled as a degree-seven polynomial. The mathematical challenge that the algorithm underlying the trajectory planning subsystem solves is the challenge of solving for all of the coefficients on all of the polynomial segments such that create a smooth and flyable trajectory that passes through each waypoint. If there are, in general, N input waypoints, then there are thus $N - 1$ trajectory segments and $8(N - 1)$ unknown coefficients to solve for. 
 
-$$ 
+<p align="center">
+  <img src="figures/Basis_Polynomials.png" alt="$$ 
 \begin{aligned} x(t) &= 1 + 1\,t + 1\,t^2 + 1\,t^3 + 1\,t^4 + 1\,t^5 + 1\,t^6 + 1\,t^7, \\ x'(t) &= 0 + 1\,t + 2\,t^2 + 3\,t^3 + 4\,t^4 + 5\,t^5 + 6\,t^6 + 7\,t^7, \\ x''(t) &= 0 + 0\,t + 2\,t^2 + 6\,t^3 + 12\,t^4 + 20\,t^5 + 30\,t^6 + 42\,t^7, \\ x'''(t) &= 0 + 0\,t + 0\,t^2 + 6\,t^3 + 24\,t^4 + 60\,t^5 + 120\,t^6 + 210\,t^7, \\ x^{(4)}(t) &= 0 + 0\,t + 0\,t^2 + 0\,t^3 + 24\,t^4 + 120\,t^5 + 360\,t^6 + 840\,t^7, \\ x^{(5)}(t) &= 0 + 0\,t + 0\,t^2 + 0\,t^3 + 0\,t^4 + 120\,t^5 + 720\,t^6 + 2520\,t^7, \\ x^{(6)}(t) &= 0 + 0\,t + 0\,t^2 + 0\,t^3 + 0\,t^4 + 0\,t^5 + 720\,t^6 + 5040\,t^7. \end{aligned} 
-$$
+$$" width="400">
+</p>
+
 
 **Figure 7.** The integrated path and trajectory planner’s trajectory planning subsystem models trajectory segments as degree-seven polynomials. It solves for a feasible trajectory by building a system of linear algebraic equations that enforces constraints on position as well as the first six motion derivatives. 
 
 The trajectory planning algorithm’s logic is focused on formulating a system of linear algebraic equations composed of exactly as many constraining equations as unknown coefficients. The first six independent constraints are tied to enforcing what are called “natural boundary conditions” at the first and last waypoint, that is the velocity, acceleration, and jerk are zeroed. Mathematically,
 
-$$
+
+<p align="center">
+  <img src="figures/Boundary_Conditions.png" alt="$$
 x'(t_0^s) = 0,\quad x''(t_0^s) = 0,\quad x'''(t_0^s) = 0,\quad x'(t_{N-1}^e) = 0,\quad x''(t_{N-1}^e) = 0,\quad x'''(t_{N-1}^e) = 0.
-$$
+$$" width="600">
+</p>
+
+
 
 The next $N$ constraints come from fixing the position at each waypoint. Mathematically,
 
-$$ 
+<p align="center">
+  <img src="figures/Waypoint_Constraints.png" alt="$$ 
 \begin{aligned} x(t_0^s) &= x_0, \\ x(t_1^s) &= x_1, \\ &\quad\vdots \\ x(t_{N-1}^s) &= x_{N-1}. \end{aligned} 
-$$
+$$" width="125">
+</p>
+
+
 
 The remaining constraints, which count to $7 * (N - 2)$, come from enforcing continuity in position plus the first six motion derivatives of motion at each of the intermediate waypoints. Mathematically, 
 
+<p align="center">
+  <img src="figures/Continuity_Constraints.png" alt="
 $$
 \begin{aligned}
 x(t_0^e) &= x(t_1^s),\quad x(t_1^e) = x(t_2^s),\quad \ldots,\quad x(t_{N-2}^e) = x(t_{N-1}^s),\\[1mm]
@@ -108,17 +122,21 @@ x'(t_0^e) &= x'(t_1^s),\quad x'(t_1^e) = x'(t_2^s),\quad \ldots,\quad x'(t_{N-2}
 &\quad\vdots\quad\vdots\quad\vdots\quad\vdots\\[1mm]
 x^{(6)}(t_0^e) &= x^{(6)}(t_1^s),\quad x^{(6)}(t_1^e) = x^{(6)}(t_2^s),\quad \ldots,\quad x^{(6)}(t_{N-2}^e) = x^{(6)}(t_{N-1}^s).
 \end{aligned}
-$$
+$$" width="510">
+</p>
+
 
 The trajectory planning module’s code develops the system of equations in a matrix form, leveraging the C++ matrix linear algebra library. The matrix equation has the form 
 
-$$ 
+<p align="center">
+  <img src="figures/Matrix_System.png" alt="$$ 
 \mathbf{M}\,\mathbf{c} = \mathbf{b},
-$$
+$$" width="80">
+</p>
 
 where $\mathbf{b}$ is the $8(N-1)$ column vector of constraints, $\mathbf{c}$ is the $8(N-1)$ column vector of unknown coefficients, and the $8(N-1)$ x $8 (N-1)$ $\mathbf{M}$ matrix is the linear transformation that maps the coefficient vector to the constraint vector. In the code, the `TrajectoryPlanner` class encapsulates the matrix assembly and matrix solving logic. The methods `assembleBoundaryMatrix`, `assembleWaypointMatrix`, and `assembleContinuityMatrix` assemble $\mathbf{M}$ from three submatrices, one for each of the three groupings of constraint equations. 
 
-Once the trajectory module assembles the system of equations in this matrix form, it leverages Eigen’s built in matrix system solving tools to determine the unknown coefficients. Since waypoint information is three dimensional, the trajectory planning system actually formulates and solves such a system of equations three times, one for each spatial degree of freedom. Also, through a parameter called maxSpeed, the API allows for direct control of how much time is allocated to each trajectory segment. Time allocation is based on dividing the Euclidean distance between waypoints by whatever is five times less than maxSpeed–a heuristic calculation that has proven effective when generating trajectories from RRT outputs using standard settings but is also a heuristic calculation that can be further tuned for enhanced performance or customization. 
+Once the trajectory module assembles the system of equations in this matrix form, it leverages Eigen’s built in matrix system solving tools to determine the unknown coefficients. Since waypoint information is three dimensional, the trajectory planning system actually formulates and solves such a system of equations three times, one for each spatial degree of freedom. Also, through a parameter called `maxSpeed`, the API allows for direct control of how much time is allocated to each trajectory segment. Time allocation is based on dividing the Euclidean distance between waypoints by whatever is five times less than `maxSpeed`–a heuristic calculation that has proven effective when generating trajectories from RRT outputs using standard settings but is also a heuristic calculation that can be further tuned for enhanced performance or customization. 
 
 ![Trajectory3D](figures/trajectory3d.png)
 
