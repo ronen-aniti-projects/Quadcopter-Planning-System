@@ -87,7 +87,6 @@ The trajectory planning subsystem treats the trajectory planning problem into a 
 $$" width="400">
 </p>
 
-
 **Figure 7.** The integrated path and trajectory planner’s trajectory planning subsystem models trajectory segments as degree-seven polynomials. It solves for a feasible trajectory by building a system of linear algebraic equations that enforces constraints on position as well as the first six motion derivatives. 
 
 The trajectory planning algorithm’s logic is focused on formulating a system of linear algebraic equations composed of exactly as many constraining equations as unknown coefficients. The first six independent constraints are tied to enforcing what are called “natural boundary conditions” at the first and last waypoint, that is the velocity, acceleration, and jerk are zeroed. Mathematically,
