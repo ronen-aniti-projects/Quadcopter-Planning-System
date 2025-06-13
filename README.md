@@ -148,7 +148,7 @@ I’ve taken steps to develop the integrated path and trajectory planning system
  
 ## Take a Closer Look
 ### Clone the Repository
-```git clone https://https://github.com/ronen-aniti-projects/Quadcopter-Planning-System```
+```git clone https://https://github.com/ronen-aniti-projects/Quadcopter-Planning-System.git```
 
 ### Download Dependencies
 1. Download Eigen from Eigen’s official website, https://eigen.tuxfamily.org/, and follow the installation instructions.
