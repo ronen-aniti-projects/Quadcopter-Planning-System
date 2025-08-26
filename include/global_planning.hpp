@@ -1,54 +1,30 @@
 #pragma once 
 
 #include <optional>
-#include "types.hpp"
+#include "utils.hpp"
 #include "obstacle_processor.hpp"
+#include "KDTree.hpp"
 
-namespace GlobalPlanning{
+namespace global_planning{
 
     class FreeSpaceGraph {
     
         public: 
-            /**
-             * @brief Construct a 3D cubic lattice graph representation of free space
-             * 
-             * @param obstacles The obstacle data object 
-             * @param resolution The resolution of the graph
-             */
-            FreeSpaceGraph(const obstacle_processor::ObstacleData& obstacles, const double resolution = planning_config::GLOBAL_RESOLUTION);
-            
-            /**
-             * @brief Destroy the FreeSpaceGraph object
-             * 
-             */
+            FreeSpaceGraph(const obstacle_processor::ObstacleProcessor& obstacles, const double resolution = planning_config::GLOBAL_RESOLUTION);
             ~FreeSpaceGraph() = default;
-
-            /**
-             * @brief Searches the 
-             * 
-             * @param start 
-             * @param goal 
-             * @return std::vector<types::Point3D> 
-             */
-            [[nodiscard]] std::optional<std::vector<types::Point3D>> search(const types::Point3D& start, const types::Point3D goal) const;
-        
+            [[nodiscard]] std::optional<std::vector<std::vector<double>>> search(const std::vector<double>& start, const std::vector<double>& goal) const;
+            [[nodiscard]] std::vector<std::vector<double>> get_nodes() const{return nodes_;}
+            [[nodiscard]] std::vector<std::vector<std::pair<size_t, double>>> get_edges() const{return edges_;}
+    
         private: 
-
-            /**
-             * @brief All of the (x, y, z) nodes of the graph structure 
-             * 
-             */
-            std::vector<types::Point3D> nodes_;
-
-            /**
-             * @brief A data structure describing the connectivity of the graph
-             * @note Each edge is weighted with the Euclidean distance between its nodes. 
-             * 
-             */
-            std::vector<std::vector<std::pair<int, double>>> edges_;
-
-
-
+            double resolution_; 
+            obstacle_processor::ObstacleProcessor obstacles_;
+            std::vector<std::vector<double>> nodes_;
+            mutable KDTree nodes_kd_;
+            std::vector<std::vector<std::pair<size_t, double>>> edges_;
+            [[nodiscard]] bool validate_edge(const std::vector<double> &point_1, const std::vector<double> &point_2, const double step_size = planning_config::EDGE_VALIDATION_STEP_SIZE) const;
+            [[nodiscard]] std::vector<std::vector<double>> backtrack(std::unordered_map<size_t, size_t> parents, size_t goal_idx, size_t start_idx) const;
+            
     };
 
 

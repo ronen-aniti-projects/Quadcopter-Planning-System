@@ -6,6 +6,8 @@ add_compile_options(-Wall -pedantic-errors)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+enable_testing()
+
 include(FetchContent)
 
 # Fetch Eigen 
@@ -39,10 +41,13 @@ add_executable(main_cpp src/main.cpp
                src/global_planning.cpp 
                src/local_planning.cpp 
                src/obstacle_processor.cpp
-               src/trajectory_planning.cpp)
+               src/trajectory_planning.cpp
+               src/utils.cpp)
 
 # Include headers
 target_include_directories(main_cpp PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 # Link Eigen and KDTree
 target_link_libraries(main_cpp PRIVATE Eigen3::Eigen KDTreeLib)
+
+add_subdirectory(tests)
