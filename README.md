@@ -169,4 +169,10 @@ cmake --build .
 ```
 
 ### Test It Out
-Run the test scripts to assess the performance of all three components of the algorithm under various parameter settings. Experiment with modifying the planning parameters in `ObstacleData.cpp`, `GlobalPlanning.cpp`, and `TrajectoryPlanning.cpp`—such as the graph resolution, neighbor connectivity, RRT goal bias, and RRT step size—to understand their effects on performance.
+Run the main executable to assess the performance of local and global planners via the Monte Carlo demonstration. 
+
+```
+./main_cpp
+```
+
+Experiment with modifying the planning parameters prompted via the CLI--including graph resolution and RRT goal bias--to understand their effects on performance. 
