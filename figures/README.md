@@ -148,25 +148,14 @@ I’ve taken steps to develop the integrated path and trajectory planning system
  
 ## Take a Closer Look
 ### Clone the Repository
-Obtain the project files from GitHub, then navigate to the project's root directory. 
-```
-git clone https://https://github.com/ronen-aniti-projects/Quadcopter-Planning-System
-cd Quadcopter-Planning-System
-```
+```git clone https://https://github.com/ronen-aniti-projects/Quadcopter-Planning-System```
 
-### Install the Prerequisites
-This project automatically fetches and builds required libraries during configuration, including MPL2 license C++ template library for linear algebra Eigen and a BSD 3-Clause license KD-Tree implementation by J. Frederico Carvalho. Ensure you have the following installed on your system before proceeding: 
-1. CMake ≥ 3.10
-2. A C++17 compiler
-3. Git 
+### Download Dependencies
+1. Download Eigen from Eigen’s official website, https://eigen.tuxfamily.org/, and follow the installation instructions.
+2. The KDTree library (BSD 3-Clause License by J. Frederico Carvalho) is included in the include folder. 
 
-### Build the Project
-Configure the build system, then compile the source code. 
-```
-mkdir build && cd build
-cmake ..
-cmake --build .
-```
+### Compile the Project
+```g++ -o trajectory_planner.exe main.cpp GlobalPlanning.cpp LocalPlanning.cpp TrajectoryPlanning.cpp ObstacleData.cpp include/KDTree.cpp -Iinclude/```
 
 ### Test It Out
 Run the test scripts to assess the performance of all three components of the algorithm under various parameter settings. Experiment with modifying the planning parameters in `ObstacleData.cpp`, `GlobalPlanning.cpp`, and `TrajectoryPlanning.cpp`—such as the graph resolution, neighbor connectivity, RRT goal bias, and RRT step size—to understand their effects on performance.
