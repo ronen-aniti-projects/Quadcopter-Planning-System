@@ -154,7 +154,7 @@ git clone https://https://github.com/ronen-aniti-projects/Quadcopter-Planning-Sy
 cd Quadcopter-Planning-System
 ```
 
-### Install Prerequisites
+### Install the Prerequisites
 This project automatically fetches and builds required libraries during configuration, including MPL2 license C++ template library for linear algebra Eigen and a BSD 3-Clause license KD-Tree implementation by J. Frederico Carvalho. Ensure you have the following installed on your system before proceeding: 
 1. CMake ≥ 3.10
 2. A C++17 compiler

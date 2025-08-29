@@ -182,7 +182,6 @@ std::optional<std::vector<std::vector<double>>> FreeSpaceGraph::search(const std
         // Ask: Is this the goal? If so, BREAK.
         if (current_idx == goal_idx){
             is_goal_found = true;
-            std::cout << "A* found the goal" << '\n';
             break;
         }
 

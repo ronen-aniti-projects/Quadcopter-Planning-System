@@ -16,6 +16,7 @@
 
 #include "obstacle_processor.hpp" 
 #include "global_planning.hpp"
+#include "local_planning.hpp"
 #include "utils.hpp"
 
 int main() {
@@ -58,6 +59,65 @@ int main() {
                 std::cout << ")" << '\n';
             }
         }
+
+        if (path.has_value()){
+            std::cout << "Testing for local path between first two points of global plan: " << '\n';
+            std::vector<double> local_start_point{path.value().at(0)};
+            std::vector<double> local_goal_point{path.value().at(1)};
+            const auto& local_path{local_planning::rrt(obs, local_start_point, local_goal_point)};
+            if (local_path.has_value()){
+                std::cout << "Local path exists. Here are its coordinates: " << '\n';
+                for (size_t i{0}; i < local_path.value().size(); ++i){
+                    std::cout << "(";
+                    for (size_t j{0}; j < local_path.value().at(i).size(); ++j){
+                        if (j == local_path.value().at(i).size()-1){
+                            std::cout << local_path.value().at(i).at(j) << "";
+                        } else {
+                            std::cout << local_path.value().at(i).at(j) << ", ";
+                        } 
+                    }
+                    std::cout << ")" << '\n';                 
+                }
+
+                // Also print the shortcut path coordinates:
+                std::vector<std::vector<double>> shortcut_path{local_planning::shortcut(obs, local_path.value())};
+                std::cout << "Here are the coordinates of the shortcut path: " << '\n';
+                for (size_t i{0}; i < shortcut_path.size(); ++i){
+                    std::cout << "(";
+                    for (size_t j{0}; j < shortcut_path.at(i).size(); ++j){
+                        if (j == shortcut_path.at(i).size()-1){
+                            std::cout << shortcut_path.at(i).at(j) << "";
+                        } else {
+                            std::cout << shortcut_path.at(i).at(j) << ", ";
+                        } 
+                    }
+                    std::cout << ")" << '\n';
+                }
+
+                // Also print the fully processed path (shortcut + interpolation):
+                std::vector<std::vector<double>> processed_path{local_planning::discretize_path(shortcut_path)};
+                std::cout << "Here are the coordinates of the processed path: " << '\n';
+                for (size_t i{0}; i < processed_path.size(); ++i){
+                    std::cout << "(";
+                    for (size_t j{0}; j < processed_path.at(i).size(); ++j){
+                        if (j == processed_path.at(i).size()-1){
+                            std::cout << processed_path.at(i).at(j) << "";
+                        } else {
+                            std::cout << processed_path.at(i).at(j) << ", ";
+                        } 
+                    }
+                    std::cout << ")" << '\n';
+                }
+                
+            }
+
+            
+        }
+
+        
+
+
+
 
         // Prints this message when all tests pass, otherwise will abort with message after failing any assert.
         std::cout << "[PASS] all checks\n";

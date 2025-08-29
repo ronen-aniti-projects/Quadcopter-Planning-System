@@ -27,9 +27,10 @@ namespace obstacle_processor {
             ~ObstacleProcessor() = default; 
             [[nodiscard]] bool is_collision(const std::vector<double>& query_point) const;
             [[nodiscard]] double distance_from_obstacle(const std::vector<double>& query_point) const;
-            [[nodiscard]] std::vector<double> get_x_lim() {return x_lim_;}
-            [[nodiscard]] std::vector<double> get_y_lim() {return y_lim_;}
-            [[nodiscard]] std::vector<double> get_z_lim() {return z_lim_;}
+            [[nodiscard]] std::vector<double> get_x_lim() const {return x_lim_;}
+            [[nodiscard]] std::vector<double> get_y_lim() const {return y_lim_;}
+            [[nodiscard]] std::vector<double> get_z_lim() const {return z_lim_;}
+        
         private: 
             std::vector<std::vector<double>> obstacle_ground_centers_;
             std::vector<std::vector<double>> obstacle_ground_center_halfsizes_;

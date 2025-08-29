@@ -37,11 +37,13 @@ add_library(KDTreeLib STATIC
 target_include_directories(KDTreeLib PUBLIC ${KDTree_SOURCE_DIR})
 
 # Main Executable 
-add_executable(main_cpp src/main.cpp 
+add_executable(main_cpp 
+               src/main.cpp 
                src/global_planning.cpp 
                src/local_planning.cpp 
                src/obstacle_processor.cpp
                src/trajectory_planning.cpp
+               src/monte_carlo_tests.cpp
                src/utils.cpp)
 
 # Include headers
