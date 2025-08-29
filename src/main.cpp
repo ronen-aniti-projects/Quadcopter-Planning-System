@@ -10,7 +10,6 @@ int main(){
    // Generate an ObstacleProcessor class from the obstacle data
    const obstacle_processor::ObstacleProcessor obstacles{obstacle_processor::ObstacleProcessor("data/obstacle-data.csv")};
    
-
    // Prompt the user for some planning parameters
    const double global_resolution{helpers::ask_double("Enter Global Planner Resolution (Recommended: 25): ")};
    const double local_goal_bias{helpers::ask_double("Enter RRT Goal Bias Ratio (0 to 1): ")};
@@ -23,8 +22,6 @@ int main(){
    // Run the Monte Carlo performance assessment
    monte_carlo_trials::evaluate_global_planner(obstacles, free_space);
    monte_carlo_trials::evaluate_local_planner(obstacles, free_space, local_goal_bias);
-   
-   
 
    return 0;
 }

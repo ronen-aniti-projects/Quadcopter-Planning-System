@@ -155,7 +155,7 @@ cd Quadcopter-Planning-System
 ```
 
 ### Install the Prerequisites
-This project automatically fetches and builds required libraries during configuration, including MPL2 license C++ template library for linear algebra Eigen and a BSD 3-Clause license KD-Tree implementation by J. Frederico Carvalho. Ensure you have the following installed on your system before proceeding: 
+This project automatically fetches and builds requirements during configuration, including MPL2 license C++ template library for linear algebra Eigen and a BSD 3-Clause license KD-Tree implementation by J. Frederico Carvalho. Ensure you have the following installed on your system before proceeding: 
 1. CMake ≥ 3.10
 2. A C++17 compiler
 3. Git 
@@ -175,4 +175,4 @@ Run the main executable to assess the performance of local and global planners v
 ./main_cpp
 ```
 
-Experiment with modifying the planning parameters prompted via the CLI--including graph resolution and RRT goal bias--to understand their effects on performance. 
+Experiment with modifying the planning parameters prompted via the CLI–including graph resolution and RRT goal bias–to understand their effects on performance. 
