@@ -18,6 +18,7 @@
 #include "global_planning.hpp"
 #include "local_planning.hpp"
 #include "utils.hpp"
+#include "trajectory_planner.hpp"
 
 int main() {
 
@@ -108,11 +109,22 @@ int main() {
                     }
                     std::cout << ")" << '\n';
                 }
+
+
+                // Compute a trajectory between the interpolated waypoints
+                // desired max speed
+                const double max_speed{5.0};
+                trajectory_planner::TrajectoryPlan trajectory_object{trajectory_planner::TrajectoryPlan(processed_path, max_speed)};
+                trajectory_object.print_data();
+
                 
             }
-
+        
+        
             
         }
+
+
 
         
 
