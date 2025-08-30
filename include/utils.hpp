@@ -18,6 +18,13 @@ namespace planning_config{
     constexpr double RRT_ITERATIONS = 10000;
     constexpr double RRT_GOAL_BIAS =  0.5;
     constexpr double LOCAL_PATH_SPACING = 5.0;
+    constexpr double HEURISTIC_SPEED_CONSTANT = 5.0;
+    constexpr int COEFFS_PER_SEGMENT = 8;
+    constexpr int NUM_BOUNDARY_CONSTRAINTS = 6;
+    constexpr double CHAIN_RULE_COMPONENT = 2.0;
+    constexpr int TRAJ_POLYNOMIAL_ORDER = 7;
+    constexpr int NUM_AXES = 3;
+    constexpr double TRAJECTORY_TIME_POINT_SPACING = 0.01;
 } // namespace planning_config
 
 

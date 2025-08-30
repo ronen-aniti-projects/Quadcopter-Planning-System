@@ -1,5 +1,3 @@
-#pragma once
-
 /**
  * @file obstacle_processor.hpp
  * @author Ronen Aniti (raniti@umd.edu)
@@ -10,6 +8,9 @@
  * @copyright Copyright (c) 2025
  * 
  */
+
+
+#pragma once
 
 #include <string> 
 #include <string_view>
