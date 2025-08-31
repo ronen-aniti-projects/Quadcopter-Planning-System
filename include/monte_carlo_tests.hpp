@@ -1,7 +1,7 @@
 /**
  * @file monte_carlo_tests.hpp
  * @author Ronen Aniti (raniti@umd.edu)
- * @brief Header file where Monte Carlo performance assessment functions are declared.
+ * @brief Provides Monte Carlo-based performance assessment tools for planner benchmarking.
  * @version 0.1
  * @date 2025-08-29
  * 
@@ -10,6 +10,7 @@
  */
 
 #pragma once 
+
 #include "obstacle_processor.hpp"
 #include "local_planning.hpp"
 #include "global_planning.hpp"
@@ -17,31 +18,32 @@
 
 /**
  * @namespace monte_carlo_trials
- * @brief Implements tools for Monte Carlo performance assessment of path planners
+ * @brief Provides tools to assess performance of global and local planner modules.
  */
 namespace monte_carlo_trials{
 
     /**
-     * @brief Prints waypoint coordinates to the console
+     * @brief Prints elements of a vector container to the console using a consistent format
      * 
-     * @param points Input points
+     * @param points (std::vector<std::vector<double>>): Waypoint plan
      */
     void display_points(const std::vector<std::vector<double>>& points) noexcept;
 
     /**
-     * @brief Implements Monte Carlo assessment of the global planner
+     * @brief Assesses the performance of the global planning module. Examines the time it takes to complete A* between valid waypoint plans spaced several hundered meters apart.
      * 
-     * @param obstacles The object representing the obstacles
-     * @param free_space The object representing the free space
+     * @param obstacles (ObstacleProcessor): Obstaclestructure
+     * @param free_space (FreeSpaceGraph): Free space graph object
      */
     void evaluate_global_planner(const obstacle_processor::ObstacleProcessor& obstacles, const global_planning::FreeSpaceGraph& free_space);
     
     /**
-     * @brief Implements Monte Carlo assessment of the local planner
+     * @brief Assesses the performance of the local planning module. Analyzes the runtime for RRT to complete searches between valid start/goal configrations. 
      * 
-     * @param obstacles The object representing the obstacles
-     * @param free_space The object representing the free space
-     * @param goal_bias The probability of sampling the goal node
+     * @param obstacles (ObstacleProcessor): Obstacle structure
+     * @param free_space (FreeSpaceGraph): Free space graph object
+     * @param goal_bias RRT goal bias setting
      */
     void evaluate_local_planner(const obstacle_processor::ObstacleProcessor& obstacles, const global_planning::FreeSpaceGraph& free_space, const double goal_bias);
+
 } // namespace monte_carlo_trials
