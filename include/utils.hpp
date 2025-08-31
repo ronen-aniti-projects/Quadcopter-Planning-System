@@ -1,7 +1,7 @@
 /**
  * @file utils.hpp
  * @author Ronen Aniti (raniti@umd.edu)
- * @brief 
+ * @brief Provides constants and helper functions used project wide
  * @version 0.1
  * @date 2025-08-29
  * 
@@ -28,7 +28,7 @@ namespace demo {
 
 /**
  * @namespace planning_config
- * @brief Constants for global, local, and trajectory planner default settings
+ * @brief Provides default settings applied in local, global, and trajectory planning modules
  */
 namespace planning_config{
     constexpr double GLOBAL_RESOLUTION = 25.0;
@@ -49,13 +49,14 @@ namespace planning_config{
 } // namespace planning_config
 
 
+// Forward declaration
 namespace obstacle_processor {
     class ObstacleProcessor;
 } // namespace obstacle_processor
 
 /**
  * @namespace helpers
- * @brief Helper functions used across various modules of the project
+ * @brief Provides helper functions used across the project
  * 
  */
 namespace helpers{
